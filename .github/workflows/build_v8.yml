@@ -186,7 +186,7 @@ jobs:
       - name: packaging
         run: |
           cd staging
-          tar -czf ../v8.tar.gz .
+          tar -czf ../v8_${{ github.event.inputs.bundle_tag }}.tar.gz .
           cd ..
 
       - uses: actions/create-release@v1
