@@ -1,0 +1,77 @@
+# This is a basic workflow to help you get started with Actions
+
+name: v8-windows-x64
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Fetch v8
+        shell: cmd
+        run: |
+          cd %GITHUB_WORKSPACE%
+          echo %GITHUB_WORKSPACE%
+          echo %PATH%
+
+          git config --global core.autocrlf false
+          git config --global core.filemode false
+          git config --global branch.autosetuprebase always
+          git config --global core.longpaths true
+
+          curl https://storage.googleapis.com/chrome-infra/depot_tools.zip --output ./depot_tools.zip
+          7z x -odepot_tools depot_tools.zip
+          set PATH=%GITHUB_WORKSPACE%\depot_tools;%PATH%
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+
+          echo _____depot_tools_____
+          cd depot_tools
+          call gclient
+          
+          cd ..
+          mkdir v8
+          cd v8
+          echo _____fetch_____
+          call fetch v8
+          echo _____enter_____
+          cd v8
+          echo _____checkout_____
+          call git checkout refs/tags/12.4.254.20
+          echo _____sync_____
+          call gclient sync
+
+          echo _____ninja_____ dont know why v8gen.py cant properly generate files we want
+          call gn gen .\out.gn\x64.release -args="is_component_build=false is_debug=false target_cpu=""x64"" target_os=""win"" v8_enable_i18n_support=false v8_monolithic=true v8_use_external_startup_data=false v8_enable_pointer_compression=true v8_jitless=false use_custom_libcxx=false treat_warnings_as_errors=false v8_symbol_level=0 v8_enable_sandbox=false"
+          echo _____list_____
+          dir .\out.gn\x64.release
+          more .\out.gn\x64.release\args.gn
+          echo _____build_____
+          call ninja -C .\out.gn\x64.release v8_monolith
+          echo _____results_____
+          dir %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\*.lib
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          path: v8/v8/out.gn/x64.release/obj/v8_monolith.lib
+          name: prebuilt_v8_windows_x64
+        
+

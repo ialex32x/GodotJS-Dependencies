@@ -1,0 +1,211 @@
+
+name: GodotJS Dependencies
+on:
+  workflow_dispatch:
+    inputs:
+      bundle_tag:
+        description: 'package version tag'
+        required: true
+
+jobs:
+  v8_macos_arm64:
+    # The type of runner that the job will run on
+    runs-on: macos-latest-xlarge
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Build
+        run: |
+          cd $GITHUB_WORKSPACE
+          pwd
+
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          cd v8
+          git checkout refs/tags/12.4.254.20
+          gclient sync
+
+          cd $GITHUB_WORKSPACE/v8/v8
+          python ./tools/dev/v8gen.py arm64.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.macos_arm64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
+          ls -l $GITHUB_WORKSPACE/depot_tools/ninja 
+          ls -l $GITHUB_WORKSPACE/depot_tools/autoninja 
+          ninja -C ./out.gn/arm64.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/macos.arm64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/macos.arm64.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8
+          path: staging/
+
+  v8_linux_x64:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build generate-ninja pkg-config
+
+          cd $GITHUB_WORKSPACE
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          cd v8
+          git checkout refs/tags/12.4.254.20
+          gclient sync
+
+          cd $GITHUB_WORKSPACE/v8/v8
+          sh ./build/install-build-deps.sh
+          python ./tools/dev/v8gen.py x64.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.linux_x64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/
+          ninja -C ./out.gn/x64.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/linux.x86_64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/linux.x86_64.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8
+          path: staging/
+
+  v8_windows_x64:
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Build
+        shell: cmd
+        run: |
+          cd %GITHUB_WORKSPACE%
+          echo %GITHUB_WORKSPACE%
+          echo %PATH%
+
+          git config --global core.autocrlf false
+          git config --global core.filemode false
+          git config --global branch.autosetuprebase always
+          git config --global core.longpaths true
+
+          curl https://storage.googleapis.com/chrome-infra/depot_tools.zip --output ./depot_tools.zip
+          7z x -odepot_tools depot_tools.zip
+          set PATH=%GITHUB_WORKSPACE%\depot_tools;%PATH%
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+
+          echo _____depot_tools_____
+          cd depot_tools
+          call gclient
+          
+          cd ..
+          mkdir v8
+          cd v8
+          echo _____fetch_____
+          call fetch v8
+          echo _____enter_____
+          cd v8
+          echo _____checkout_____
+          call git checkout refs/tags/12.4.254.20
+          echo _____sync_____
+          call gclient sync
+
+          echo _____ninja_____ dont know why v8gen.py cant properly generate files we want
+          call gn gen .\out.gn\x64.release -args="is_component_build=false is_debug=false target_cpu=""x64"" target_os=""win"" v8_enable_i18n_support=false v8_monolithic=true v8_use_external_startup_data=false v8_enable_pointer_compression=true v8_jitless=false use_custom_libcxx=false treat_warnings_as_errors=false v8_symbol_level=0 v8_enable_sandbox=false"
+          echo _____list_____
+          dir .\out.gn\x64.release
+          more .\out.gn\x64.release\args.gn
+          echo _____build_____
+          call ninja -C .\out.gn\x64.release v8_monolith
+          echo _____results_____
+          dir %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\*.lib
+
+          mkdir staging\v8\include
+          mkdir staging\v8\windows.x86_64.release
+          xcopy include staging\v8\include\ /Q /R /S /F /Y
+          copy v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows.x86_64.release\v8_monolith.lib /Y /B
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8
+          path: staging/
+  publish:
+    runs-on: ubuntu-latest
+    needs: 
+      - v8_macos_arm64
+      - v8_linux_x64
+      - v8_windows_x64
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: prebuilt_v8
+          path: staging/
+      - name: packaging
+        run: |
+          cd staging
+          tar -czf ../v8.tar.gz .
+          cd ..
+
+      - uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with: 
+          tag_name: v8_${{ github.event.inputs.bundle_tag }}
+          release_name: v8_${{ github.event.inputs.bundle_tag }}
+          draft: false
+          prerelease: false
+          body: |
+            update v8
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with: 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: v8_${{ github.event.inputs.bundle_tag }}.tar.gz
+          asset_name: v8_${{ github.event.inputs.bundle_tag }}.tar.gz
+          asset_content_type: application/gzip
+
