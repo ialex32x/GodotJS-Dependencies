@@ -97,7 +97,7 @@ jobs:
 
           cd $GITHUB_WORKSPACE
           mkdir -p staging/v8/linux.x86_64.release
-          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/linux.x86_64.release/
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/linux.x86_64.release/
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -165,7 +165,7 @@ jobs:
           mkdir staging\v8\include
           mkdir staging\v8\windows.x86_64.release
           xcopy include staging\v8\include\ /Q /R /S /F /Y
-          copy v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows.x86_64.release\v8_monolith.lib /Y /B
+          copy %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows.x86_64.release\v8_monolith.lib /Y /B
 
       - name: Upload
         uses: actions/upload-artifact@v4
