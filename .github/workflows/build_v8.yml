@@ -47,8 +47,8 @@ jobs:
           ninja -C ./out.gn/arm64.release v8_monolith
 
           cd $GITHUB_WORKSPACE
-          mkdir -p staging/v8/macos.arm64.release
-          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/macos.arm64.release/
+          mkdir -p staging/v8
+          mv $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/libv8_macos_arm64_release.a
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -96,8 +96,8 @@ jobs:
           ninja -C ./out.gn/x64.release v8_monolith
 
           cd $GITHUB_WORKSPACE
-          mkdir -p staging/v8/linux.x86_64.release
-          cp $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/linux.x86_64.release/
+          mkdir -p staging/v8
+          mv $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/libv8_linux_x64_release.a
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -164,9 +164,8 @@ jobs:
 
           cd %GITHUB_WORKSPACE%
           mkdir staging\v8\include
-          mkdir staging\v8\windows.x86_64.release
-          xcopy %GITHUB_WORKSPACE%\include staging\v8\include\ /Q /R /S /F /Y
-          copy %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows.x86_64.release\v8_monolith.lib /Y /B
+          xcopy %GITHUB_WORKSPACE%\v8\v8\include staging\v8\include\ /Q /R /S /F /Y
+          copy %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\libv8_windows_x64_release.lib /Y /B
 
       - name: Upload
         uses: actions/upload-artifact@v4
