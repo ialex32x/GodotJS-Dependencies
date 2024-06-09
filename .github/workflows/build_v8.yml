@@ -165,7 +165,7 @@ jobs:
           cd %GITHUB_WORKSPACE%
           mkdir staging\v8\include
           mkdir staging\v8\windows.x86_64.release
-          xcopy %GITHUB_WORKSPACE%\include staging\v8\include\ /Q /R /S /F /Y
+          xcopy %GITHUB_WORKSPACE%\v8\v8\include staging\v8\include\ /Q /R /S /F /Y
           copy %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows.x86_64.release\v8_monolith.lib /Y /B
 
       - name: Upload
@@ -187,9 +187,11 @@ jobs:
 
       - name: packaging
         run: |
+          sudo apt-get install zip unzip
+
           cd staging
           ls -R
-          tar -czf ../v8_${{ github.event.inputs.bundle_tag }}.tar.gz .
+          zip -r v8_${{ github.event.inputs.bundle_tag }}.zip v8/
           cd ..
 
       - uses: actions/create-release@v1
@@ -208,7 +210,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: v8_${{ github.event.inputs.bundle_tag }}.tar.gz
-          asset_name: v8_${{ github.event.inputs.bundle_tag }}.tar.gz
-          asset_content_type: application/gzip
+          asset_path: v8_${{ github.event.inputs.bundle_tag }}.zip
+          asset_name: v8_${{ github.event.inputs.bundle_tag }}.zip
+          asset_content_type: application/zip
 
