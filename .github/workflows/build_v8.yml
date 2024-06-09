@@ -210,7 +210,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: v8_${{ github.event.inputs.bundle_tag }}.zip
+          asset_path: staging/v8_${{ github.event.inputs.bundle_tag }}.zip
           asset_name: v8_${{ github.event.inputs.bundle_tag }}.zip
           asset_content_type: application/zip
 
