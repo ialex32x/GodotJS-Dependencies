@@ -25,6 +25,7 @@ jobs:
           python-version: '3.12'
 
       # Runs a single command using the runners shell
+      # See https://v8.dev/docs/cross-compile-arm
       - name: Fetch v8
         run: |
           sudo apt-get update
@@ -38,6 +39,8 @@ jobs:
           mkdir $GITHUB_WORKSPACE/v8
           cd $GITHUB_WORKSPACE/v8
           fetch v8
+          echo "target_os = ['android']" >> .gclient
+          cat .gclient
           cd v8
           git checkout refs/tags/12.4.254.20
           gclient sync -D
