@@ -6,6 +6,7 @@
 target_os = "android"
 target_cpu = "arm64"
 v8_target_cpu = "arm64"
+use_sysroot = false
 
 dcheck_always_on = false
 

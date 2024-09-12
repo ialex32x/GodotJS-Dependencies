@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: v8-android-armv8
+name: v8-android-arm64-v8a
 
 # Controls when the workflow will run
 on:
@@ -50,10 +50,9 @@ jobs:
           cd $GITHUB_WORKSPACE/v8/v8
           ls -l ./build/
           sh ./build/install-build-deps.sh --android
-          sh ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           python ./tools/dev/v8gen.py arm64.release
           cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
-          ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/
+          cat $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ninja -C ./out.gn/arm64.release v8_monolith
 
       - name: Upload
