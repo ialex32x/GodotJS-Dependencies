@@ -42,12 +42,13 @@ jobs:
           git checkout refs/tags/12.4.254.20
           gclient sync
 
-      - name: Build v8 x86_64
+      - name: Build v8 arm64-v8a
         run: |
           cd $GITHUB_WORKSPACE/v8/v8
+          ls -l ./build/
           sh ./build/install-build-deps-android.sh
           python ./tools/dev/v8gen.py arm64.release
-          cp $GITHUB_WORKSPACE/Scripts/v8.android_armv8.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
+          cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/
           ninja -C ./out.gn/arm64.release v8_monolith
 
@@ -55,6 +56,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           path: v8/v8/out.gn/arm64.release/obj/libv8_monolith.a
-          name: prebuilt_v8_android_armv8
+          name: prebuilt_v8_android_arm64_v8a
         
 
