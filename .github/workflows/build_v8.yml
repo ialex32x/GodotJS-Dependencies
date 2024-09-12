@@ -273,9 +273,9 @@ jobs:
 
           cd %GITHUB_WORKSPACE%
           mkdir staging\v8\include
-          mkdir staging\v8\windows.x86_64.release
+          mkdir staging\v8\windows_x86_64_release
           xcopy %GITHUB_WORKSPACE%\v8\v8\include staging\v8\include\ /Q /R /S /F /Y
-          copy %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows.x86_64.release\v8_monolith.lib /Y /B
+          copy %GITHUB_WORKSPACE%\v8\v8\out.gn\x64.release\obj\v8_monolith.lib staging\v8\windows_x86_64_release\v8_monolith.lib /Y /B
 
       - name: Upload
         uses: actions/upload-artifact@v4
