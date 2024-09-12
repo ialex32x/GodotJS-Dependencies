@@ -40,13 +40,13 @@ jobs:
           fetch v8
           cd v8
           git checkout refs/tags/12.4.254.20
-          gclient sync
+          gclient sync -D
 
       - name: Build v8 arm64-v8a
         run: |
           cd $GITHUB_WORKSPACE/v8/v8
           ls -l ./build/
-          sh ./build/install-build-deps-android.sh
+          sh ./build/install-build-deps.sh --android
           python ./tools/dev/v8gen.py arm64.release
           cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/
