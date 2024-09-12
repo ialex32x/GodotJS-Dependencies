@@ -45,7 +45,7 @@ jobs:
       - name: Build v8 x86_64
         run: |
           cd $GITHUB_WORKSPACE/v8/v8
-          sh ./build/install-build-deps.sh
+          sh ./build/install-build-deps-android.sh
           python ./tools/dev/v8gen.py arm64.release
           cp $GITHUB_WORKSPACE/Scripts/v8.android_armv8.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/
