@@ -50,6 +50,7 @@ jobs:
           cd $GITHUB_WORKSPACE/v8/v8
           ls -l ./build/
           sh ./build/install-build-deps.sh --android
+          python ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           python ./tools/dev/v8gen.py arm64.release
           cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           cat $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
