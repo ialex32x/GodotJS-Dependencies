@@ -35,9 +35,9 @@ jobs:
           wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
           unzip -q android-ndk.zip
           export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
-          echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn
-          echo "default_android_ndk_version = \"r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn
-          cat $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn
+          echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          echo "default_android_ndk_version = \"r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          cat $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
 
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
@@ -58,7 +58,7 @@ jobs:
           sh ./build/install-build-deps.sh --android
           python ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           python ./tools/dev/v8gen.py arm64.release
-          cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
+          cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           cat $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ninja -C ./out.gn/arm64.release v8_monolith
 
@@ -66,6 +66,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           path: v8/v8/out.gn/arm64.release/obj/libv8_monolith.a
-          name: prebuilt_v8_android_arm64_v8a
+          name: prebuilt_v8_android_arm64
         
 
