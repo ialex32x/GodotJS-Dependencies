@@ -29,9 +29,16 @@ jobs:
       - name: Fetch v8
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build generate-ninja pkg-config
+          sudo apt-get install -y ninja-build generate-ninja pkg-config zip unzip
 
           cd $GITHUB_WORKSPACE
+          wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
+          unzip -q android-ndk.zip
+          export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
+          echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn
+          echo "default_android_ndk_version = \"r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn
+          cat $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn
+
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
           cd depot_tools
@@ -50,8 +57,6 @@ jobs:
           cd $GITHUB_WORKSPACE/v8/v8
           sh ./build/install-build-deps.sh --android
           python ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
-          ls -l ./third_party/android_ndk
-
           python ./tools/dev/v8gen.py arm64.release
           cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           cat $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
