@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: v8-ios-arm64
+name: v8-ios-x86_64
 
 # Controls when the workflow will run
 on:
@@ -42,7 +42,7 @@ jobs:
           git checkout refs/tags/12.4.254.20
           gclient sync -D
 
-      - name: Build v8 ios-arm64
+      - name: Build v8 ios-x86_64
         run: |
           export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
           cd $GITHUB_WORKSPACE/v8/v8
