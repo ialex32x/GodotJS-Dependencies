@@ -35,8 +35,8 @@ jobs:
           wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
           unzip -q android-ndk.zip
           export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
-          echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
-          echo "default_android_ndk_version = \"r23c\"\n" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          echo "default_android_ndk_version = \"r23c\"" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
           cat $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
 
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
