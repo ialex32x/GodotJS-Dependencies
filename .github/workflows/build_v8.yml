@@ -13,12 +13,8 @@ on:
         required: true
         default: "12.4.254.21"
 jobs:
-  v8_android_arm64_v8a:
-
-    # The type of runner that the job will run on
+  v8_android_arm64:
     runs-on: ubuntu-22.04
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,7 +24,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Runs a single command using the runners shell
       # See https://v8.dev/docs/cross-compile-arm
       - name: Fetch v8
         run: |
@@ -49,25 +44,129 @@ jobs:
           git checkout refs/tags/${{ github.event.inputs.v8_version }}
           gclient sync -D
 
-      - name: Build v8 arm64-v8a
+      - name: Build v8 arm64
         run: |
           cd $GITHUB_WORKSPACE/v8/v8
           ls -l ./build/
           sh ./build/install-build-deps.sh --android
           python ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           python ./tools/dev/v8gen.py arm64.release
-          cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64_v8a.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
+          cp $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           cat $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ninja -C ./out.gn/arm64.release v8_monolith
 
           cd $GITHUB_WORKSPACE
-          mkdir -p staging/v8/android.arm64_v8a.release
-          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/android.arm64_v8a.release/
+          mkdir -p staging/v8/android.arm64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/android.arm64.release/
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with: 
-          name: prebuilt_v8_android_arm64_v8a
+          name: prebuilt_v8_android_arm64
+          path: staging/
+
+  v8_android_arm32:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # See https://v8.dev/docs/cross-compile-arm
+      - name: Fetch v8
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build generate-ninja pkg-config
+
+          cd $GITHUB_WORKSPACE
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          echo "target_os = ['android']" >> .gclient
+          cat .gclient
+          cd v8
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
+          gclient sync -D
+
+      - name: Build v8 arm32
+        run: |
+          cd $GITHUB_WORKSPACE/v8/v8
+          ls -l ./build/
+          sh ./build/install-build-deps.sh --android
+          python ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm
+          python ./tools/dev/v8gen.py arm.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.android_arm32.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm.release/args.gn
+          cat $GITHUB_WORKSPACE/v8/v8/out.gn/arm.release/args.gn
+          ninja -C ./out.gn/arm.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/android.arm32.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm.release/obj/libv8_monolith.a staging/v8/android.arm32.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8_android_arm32
+          path: staging/
+
+  v8_android_x86_64:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # See https://v8.dev/docs/cross-compile-arm
+      - name: Fetch v8
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build generate-ninja pkg-config
+
+          cd $GITHUB_WORKSPACE
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          echo "target_os = ['android']" >> .gclient
+          cat .gclient
+          cd v8
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
+          gclient sync -D
+
+      - name: Build v8 x64
+        run: |
+          cd $GITHUB_WORKSPACE/v8/v8
+          ls -l ./build/
+          sh ./build/install-build-deps.sh --android
+          python ./build/linux/sysroot_scripts/install-sysroot.py --arch=x64
+          python ./tools/dev/v8gen.py x64.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.android_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          cat $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          ninja -C ./out.gn/x64.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/android.x86_64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/android.x86_64.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8_android_x86_64
           path: staging/
 
   v8_ios_arm64:
@@ -121,6 +220,58 @@ jobs:
         with: 
           name: prebuilt_v8_ios_arm64
           path: staging/
+
+  v8_ios_x86_64:
+    # The type of runner that the job will run on
+    runs-on: macos-14
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      # See https://v8.dev/docs/cross-compile-ios
+      - name: Fetch v8
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          echo "target_os = ['ios']" >> .gclient
+          cat .gclient
+          cd v8
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
+          gclient sync -D
+
+      - name: Build v8 ios-x86_64
+        run: |
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd $GITHUB_WORKSPACE/v8/v8
+          ls -l ./build/
+          python ./tools/dev/v8gen.py x64.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.ios_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          cat $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          ls -l $GITHUB_WORKSPACE/depot_tools/ninja
+          ninja -C ./out.gn/x64.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/ios.x86_64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/ios.x86_64.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8_ios_x86_64
+          path: staging/
         
   v8_macos_arm64:
     # The type of runner that the job will run on
@@ -170,7 +321,55 @@ jobs:
           name: prebuilt_v8_macos_arm64
           path: staging/
 
-  v8_linux_x64:
+  v8_macos_x86_64:
+    # The type of runner that the job will run on
+    runs-on: macos-14
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Build v8_macos_x86_64
+        run: |
+          cd $GITHUB_WORKSPACE
+          pwd
+
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          cd v8
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
+          gclient sync
+
+          cd $GITHUB_WORKSPACE/v8/v8
+          python ./tools/dev/v8gen.py x64.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.macos_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          ls -l $GITHUB_WORKSPACE/depot_tools/ninja 
+          ls -l $GITHUB_WORKSPACE/depot_tools/autoninja 
+          ninja -C ./out.gn/x64.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/macos.x86_64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/macos.x86_64.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8_macos_x86_64
+          path: staging/
+        
+  v8_linux_x86_64:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -216,10 +415,10 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with: 
-          name: prebuilt_v8_linux_x64
+          name: prebuilt_v8_linux_x86_64
           path: staging/
 
-  v8_windows_x64:
+  v8_windows_x86_64:
     runs-on: windows-2019
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -285,16 +484,20 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with: 
-          name: prebuilt_v8_windows_x64
+          name: prebuilt_v8_windows_x86_64
           path: staging/
   publish:
     runs-on: ubuntu-22.04
     needs: 
-      - v8_android_arm64_v8a
+      - v8_android_arm64
+      - v8_android_arm32
+      - v8_android_x86_64
       - v8_ios_arm64
+      - v8_ios_x86_64
       - v8_macos_arm64
-      - v8_linux_x64
-      - v8_windows_x64
+      - v8_macos_x86_64
+      - v8_linux_x86_64
+      - v8_windows_x86_64
     steps:
       - uses: actions/download-artifact@v4
         with:

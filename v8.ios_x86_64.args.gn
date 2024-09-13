@@ -1,0 +1,28 @@
+# v8_enable_backtrace = true
+# v8_enable_disassembler = true
+# v8_enable_object_print = true
+# v8_enable_verify_heap = true
+
+target_os = "ios"
+target_cpu = "x64"
+v8_target_cpu = "x64"
+# use_sysroot = false
+
+dcheck_always_on = false
+
+is_component_build = false
+is_debug = false
+v8_enable_i18n_support = false
+v8_monolithic = true
+v8_use_external_startup_data = false
+v8_enable_pointer_compression = false # Unsupported on iOS.
+v8_jitless = true
+v8_enable_webassembly = false
+enable_ios_bitcode = true
+ios_enable_code_signing = false
+
+use_custom_libcxx = false            # Use Xcode's libcxx.
+treat_warnings_as_errors = false    # 
+v8_symbol_level = 0                 # smaller lib 
+v8_enable_sandbox = false 
+use_rtti = true
