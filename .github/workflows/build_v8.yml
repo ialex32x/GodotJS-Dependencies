@@ -257,15 +257,15 @@ jobs:
           export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
           cd $GITHUB_WORKSPACE/v8/v8
           ls -l ./build/
-          python ./tools/dev/v8gen.py x64.release
-          cp $GITHUB_WORKSPACE/Scripts/v8.ios_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
-          cat $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          python ./tools/dev/v8gen.py release-ios
+          cp $GITHUB_WORKSPACE/Scripts/v8.ios_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/release-ios/args.gn
+          cat $GITHUB_WORKSPACE/v8/v8/out.gn/release-ios/args.gn
           ls -l $GITHUB_WORKSPACE/depot_tools/ninja
-          ninja -C ./out.gn/x64.release v8_monolith
+          ninja -C ./out.gn/release-ios v8_monolith
 
           cd $GITHUB_WORKSPACE
           mkdir -p staging/v8/ios.x86_64.release
-          cp $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/obj/libv8_monolith.a staging/v8/ios.x86_64.release/
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/release-ios/obj/libv8_monolith.a staging/v8/ios.x86_64.release/
 
       - name: Upload
         uses: actions/upload-artifact@v4

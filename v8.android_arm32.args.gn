@@ -24,3 +24,6 @@ treat_warnings_as_errors = false    #
 v8_symbol_level = 0                 # smaller lib 
 v8_enable_sandbox = false 
 use_rtti = true
+
+default_android_ndk_root = "//third_party/android_ndk"
+default_android_ndk_version = "r23c"
