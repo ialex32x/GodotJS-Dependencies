@@ -5,13 +5,18 @@ on:
     inputs:
       bundle_tag:
         description: 'package version tag'
+        type: string
         required: true
-
+      v8_version:
+        description: 'v8 version tag'
+        type: string
+        required: true
+        default: "12.4.254.21"
 jobs:
   v8_android_arm64_v8a:
 
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -41,7 +46,7 @@ jobs:
           echo "target_os = ['android']" >> .gclient
           cat .gclient
           cd v8
-          git checkout refs/tags/12.4.254.20
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
           gclient sync -D
 
       - name: Build v8 arm64-v8a
@@ -67,7 +72,7 @@ jobs:
 
   v8_ios_arm64:
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: macos-14
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -93,7 +98,7 @@ jobs:
           echo "target_os = ['ios']" >> .gclient
           cat .gclient
           cd v8
-          git checkout refs/tags/12.4.254.20
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
           gclient sync -D
 
       - name: Build v8 ios-arm64
@@ -119,7 +124,7 @@ jobs:
         
   v8_macos_arm64:
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: macos-14
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -145,7 +150,7 @@ jobs:
           cd $GITHUB_WORKSPACE/v8
           fetch v8
           cd v8
-          git checkout refs/tags/12.4.254.20
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
           gclient sync
 
           cd $GITHUB_WORKSPACE/v8/v8
@@ -167,7 +172,7 @@ jobs:
 
   v8_linux_x64:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -194,7 +199,7 @@ jobs:
           cd $GITHUB_WORKSPACE/v8
           fetch v8
           cd v8
-          git checkout refs/tags/12.4.254.20
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
           gclient sync
 
           cd $GITHUB_WORKSPACE/v8/v8
@@ -215,7 +220,7 @@ jobs:
           path: staging/
 
   v8_windows_x64:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -257,7 +262,7 @@ jobs:
           echo _____enter_____
           cd v8
           echo _____checkout_____
-          call git checkout refs/tags/12.4.254.20
+          call git checkout refs/tags/${{ github.event.inputs.v8_version }}
           echo _____sync_____
           call gclient sync
 
@@ -283,7 +288,7 @@ jobs:
           name: prebuilt_v8_windows_x64
           path: staging/
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: 
       - v8_android_arm64_v8a
       - v8_ios_arm64
