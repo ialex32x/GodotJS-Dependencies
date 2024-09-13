@@ -7,18 +7,18 @@ Workflows to build all dependencies of GodotJS (v8 and libwebsockets).
 - https://github.com/actions/create-release
 
 
-## Windows Toolchain
+## Windows Toolset
 
-This workflow uses `windows-latest` runner to build v8 for Windows. 
 Different Visual C++ Compilers are involved in different prebuilt GodotJS dependency releases:
 
-| Package | Libraries | Toolchain | Platforms/Architectures |
-|---|---|---|---|
-|[v8_r7](https://github.com/ialex32x/GodotJS-Dependencies/releases/download/v8_r7/v8_r7.zip)|v8(12.4.254.20)| MSVC v143(14.40.33807)| Windows(x86_64)<br/>Linux(x86_64)<br/>MacOS(ARM64) |
-|[v8_r9](https://github.com/ialex32x/GodotJS-Dependencies/releases/download/v8_r9/v8_r9.zip)|v8(12.4.254.20)| VS2022(17.11.3)<br/> MSVC v143(14.41.34120)| Windows(x86_64)<br/>Linux(x86_64)<br/>MacOS(ARM64)<br/>Android(ARM64-v8a)<br/>iOS(ARM64) |
+| Package | Workflow Runners | Libraries | Toolset | Platforms/Architectures |
+|---|---|---|---|---|
+|[v8_r7](https://github.com/ialex32x/GodotJS-Dependencies/releases/download/v8_r7/v8_r7.zip)| windows-latest(2022)<br/>ubuntu-latest(22.04) |v8(12.4.254.20)| MSVC v143(14.40.33807)| Windows(x86_64)<br/>Linux(x86_64)<br/>MacOS(ARM64) |
+|[v8_r9](https://github.com/ialex32x/GodotJS-Dependencies/releases/download/v8_r9/v8_r9.zip)| windows-latest(2022)<br/>ubuntu-latest(22.04) |v8(12.4.254.20)| VS2022(17.11.3)<br/> MSVC v143(14.41.34120)| Windows(x86_64)<br/>Linux(x86_64)<br/>MacOS(ARM64)<br/>Android(ARM64-v8a)<br/>iOS(ARM64) |
+|[v8_r10](https://github.com/ialex32x/GodotJS-Dependencies/releases/download/v8_r10/v8_r10.zip)| windows-2019<br/>ubuntu-22.04 |v8(12.4.254.21)| MSVC v142(14.29.30133) | Windows(x86_64)<br/>Linux(x86_64)<br/>MacOS(ARM64)<br/>Android(ARM64-v8a)<br/>iOS(ARM64) |
 
 > [!NOTE]
-> Update VS 2022 MSVC toolchain for different pacakge you used to avoid linkage errors.
+> Install specific VS 2022 MSVC toolset for different pacakge you used to avoid linkage errors.
 
 -----
 
