@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: v8-android-arm64-v8a
+name: v8-android-arm64
 
 # Controls when the workflow will run
 on:
@@ -31,13 +31,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ninja-build generate-ninja pkg-config zip unzip
 
-          cd $GITHUB_WORKSPACE
-          wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
-          unzip -q android-ndk.zip
-          export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
-          echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
-          echo "default_android_ndk_version = \"r23c\"" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
-          cat $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          # cd $GITHUB_WORKSPACE
+          # wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
+          # unzip -q android-ndk.zip
+          # export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
+          # echo "default_android_ndk_root = \"$GITHUB_WORKSPACE/android-ndk-r23c\"" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          # echo "default_android_ndk_version = \"r23c\"" >> $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
+          # cat $GITHUB_WORKSPACE/Scripts/v8.android_arm64.args.gn
 
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
@@ -49,10 +49,10 @@ jobs:
           echo "target_os = ['android']" >> .gclient
           cat .gclient
           cd v8
-          git checkout refs/tags/12.4.254.20
+          git checkout refs/tags/12.4.254.21
           gclient sync -D
 
-      - name: Build v8 arm64-v8a
+      - name: Build v8 arm64
         run: |
           cd $GITHUB_WORKSPACE/v8/v8
           sh ./build/install-build-deps.sh --android

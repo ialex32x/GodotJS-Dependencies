@@ -31,6 +31,7 @@ jobs:
           sudo apt-get install -y ninja-build generate-ninja pkg-config zip unzip 
 
           cd $GITHUB_WORKSPACE
+          
           wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
           unzip -q android-ndk.zip
           export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
@@ -90,6 +91,7 @@ jobs:
           sudo apt-get install -y ninja-build generate-ninja pkg-config zip unzip 
 
           cd $GITHUB_WORKSPACE
+
           wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
           unzip -q android-ndk.zip
           export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
@@ -149,6 +151,7 @@ jobs:
           sudo apt-get install -y ninja-build generate-ninja pkg-config zip unzip 
 
           cd $GITHUB_WORKSPACE
+
           wget -O android-ndk.zip -q https://dl.google.com/android/repository/android-ndk-r23c-linux.zip
           unzip -q android-ndk.zip
           export ANDROID_NDK=$GITHUB_WORKSPACE/android-ndk-r23c
@@ -425,7 +428,7 @@ jobs:
           cd $GITHUB_WORKSPACE/v8/v8
           sh ./build/install-build-deps.sh
           python ./tools/dev/v8gen.py x64.release
-          cp $GITHUB_WORKSPACE/Scripts/v8.linux_x64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          cp $GITHUB_WORKSPACE/Scripts/v8.linux_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
           ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/
           ninja -C ./out.gn/x64.release v8_monolith
 

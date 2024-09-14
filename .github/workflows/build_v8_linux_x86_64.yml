@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: v8-linux-x64
+name: v8-linux-x86_64
 
 # Controls when the workflow will run
 on:
@@ -47,7 +47,7 @@ jobs:
           cd $GITHUB_WORKSPACE/v8/v8
           sh ./build/install-build-deps.sh
           python ./tools/dev/v8gen.py x64.release
-          cp $GITHUB_WORKSPACE/Scripts/v8.linux_x64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
+          cp $GITHUB_WORKSPACE/Scripts/v8.linux_x86_64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/args.gn
           ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/x64.release/
           ninja -C ./out.gn/x64.release v8_monolith
 
@@ -55,6 +55,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           path: v8/v8/out.gn/x64.release/obj/libv8_monolith.a
-          name: prebuilt_v8_linux_x64
+          name: prebuilt_v8_linux_x86_64
         
 
