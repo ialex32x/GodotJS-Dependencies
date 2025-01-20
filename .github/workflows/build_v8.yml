@@ -511,6 +511,75 @@ jobs:
           name: prebuilt_v8_windows_x86_64
           path: staging/
 
+  v8_windows_arm64:
+    runs-on: windows-2019
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Build
+        shell: cmd
+        run: |
+          cd %GITHUB_WORKSPACE%
+          echo %GITHUB_WORKSPACE%
+          echo %PATH%
+
+          git config --global core.autocrlf false
+          git config --global core.filemode false
+          git config --global branch.autosetuprebase always
+          git config --global core.longpaths true
+
+          curl https://storage.googleapis.com/chrome-infra/depot_tools.zip --output ./depot_tools.zip
+          7z x -odepot_tools depot_tools.zip
+          set PATH=%GITHUB_WORKSPACE%\depot_tools;%PATH%
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+
+          echo _____depot_tools_____
+          cd depot_tools
+          call gclient
+          
+          cd ..
+          mkdir v8
+          cd v8
+          echo _____fetch_____
+          call fetch v8
+          echo _____enter_____
+          cd v8
+          echo _____checkout_____
+          call git checkout refs/tags/${{ github.event.inputs.v8_version }}
+          echo _____sync_____
+          call gclient sync
+
+          echo _____ninja_____ dont know why v8gen.py cant properly generate files we want
+          call gn gen .\out.gn\arm64.release -args="is_component_build=false is_debug=false target_cpu=""arm64"" target_os=""win"" v8_enable_i18n_support=false v8_monolithic=true v8_use_external_startup_data=false v8_enable_pointer_compression=true v8_jitless=false use_custom_libcxx=false treat_warnings_as_errors=false v8_symbol_level=0 v8_enable_sandbox=false"
+          echo _____list_____
+          dir .\out.gn\arm64.release
+          more .\out.gn\arm64.release\args.gn
+          echo _____build_____
+          call ninja -C .\out.gn\arm64.release v8_monolith
+          echo _____results_____
+          dir %GITHUB_WORKSPACE%\v8\v8\out.gn\arm64.release\obj\*.lib
+
+          cd %GITHUB_WORKSPACE%
+          mkdir staging\v8\include
+          mkdir staging\v8\windows_arm64_release
+          xcopy %GITHUB_WORKSPACE%\v8\v8\include staging\v8\include\ /Q /R /S /F /Y
+          copy %GITHUB_WORKSPACE%\v8\v8\out.gn\arm64.release\obj\v8_monolith.lib staging\v8\windows_arm64_release\v8_monolith.lib /Y /B
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8_windows_arm64
+          path: staging/
+
   # lws_linux_x86_64:
   #   runs-on: ubuntu-22.04
   #   steps:
@@ -558,6 +627,7 @@ jobs:
       - v8_macos_x86_64
       - v8_linux_x86_64
       - v8_windows_x86_64
+      - v8_windows_arm64
     steps:
       - uses: actions/download-artifact@v4
         with:
