@@ -12,6 +12,7 @@ on:
         type: string
         required: true
         default: "12.4.254.21"
+        # default: "12.9.202.28"
 jobs:
   v8_android_arm64:
     runs-on: ubuntu-22.04
@@ -476,6 +477,7 @@ jobs:
 
           cd $GITHUB_WORKSPACE/v8/v8
           sh ./build/install-build-deps.sh
+          python ./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64
           python ./tools/dev/v8gen.py arm64.release
           cp $GITHUB_WORKSPACE/Scripts/v8.linux_arm64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
           ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/
@@ -691,7 +693,7 @@ jobs:
 
           cd staging
           ls -R
-          zip -r v8_${{ github.event.inputs.bundle_tag }}.zip v8/
+          zip -r v8_${{ github.event.inputs.v8_version }}_${{ github.event.inputs.bundle_tag }}.zip v8/
           cd ..
 
       - uses: actions/create-release@v1
@@ -699,8 +701,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
-          tag_name: v8_${{ github.event.inputs.bundle_tag }}
-          release_name: v8_${{ github.event.inputs.bundle_tag }}
+          tag_name: v8_${{ github.event.inputs.v8_version }}_${{ github.event.inputs.bundle_tag }}
+          release_name: v8_${{ github.event.inputs.v8_version }}_${{ github.event.inputs.bundle_tag }}
           draft: false
           prerelease: false
           body: |
@@ -710,7 +712,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: staging/v8_${{ github.event.inputs.bundle_tag }}.zip
-          asset_name: v8_${{ github.event.inputs.bundle_tag }}.zip
+          asset_path: staging/v8_${{ github.event.inputs.v8_version }}_${{ github.event.inputs.bundle_tag }}.zip
+          asset_name: v8_${{ github.event.inputs.v8_version }}_${{ github.event.inputs.bundle_tag }}.zip
           asset_content_type: application/zip
 
