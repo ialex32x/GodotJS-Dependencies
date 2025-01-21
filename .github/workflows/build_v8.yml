@@ -441,6 +441,56 @@ jobs:
         with: 
           name: prebuilt_v8_linux_x86_64
           path: staging/
+  
+  v8_linux_arm64:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Scripts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Runs a single command using the runners shell
+      - name: Build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build generate-ninja pkg-config
+
+          cd $GITHUB_WORKSPACE
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$GITHUB_WORKSPACE/depot_tools:$PATH
+          cd depot_tools
+          gclient
+          mkdir $GITHUB_WORKSPACE/v8
+          cd $GITHUB_WORKSPACE/v8
+          fetch v8
+          cd v8
+          git checkout refs/tags/${{ github.event.inputs.v8_version }}
+          gclient sync
+
+          cd $GITHUB_WORKSPACE/v8/v8
+          sh ./build/install-build-deps.sh
+          python ./tools/dev/v8gen.py arm64.release
+          cp $GITHUB_WORKSPACE/Scripts/v8.linux_arm64.args.gn $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/args.gn
+          ls -l $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/
+          ninja -C ./out.gn/arm64.release v8_monolith
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p staging/v8/linux.arm64.release
+          cp $GITHUB_WORKSPACE/v8/v8/out.gn/arm64.release/obj/libv8_monolith.a staging/v8/linux.arm64.release/
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: prebuilt_v8_linux_arm64
+          path: staging/
+
 
   v8_windows_x86_64:
     runs-on: windows-2019
@@ -626,6 +676,7 @@ jobs:
       - v8_macos_arm64
       - v8_macos_x86_64
       - v8_linux_x86_64
+      - v8_linux_arm64
       - v8_windows_x86_64
       - v8_windows_arm64
     steps:

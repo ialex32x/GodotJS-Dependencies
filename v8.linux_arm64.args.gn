@@ -3,8 +3,7 @@
 # v8_enable_object_print = true
 # v8_enable_verify_heap = true
 
-target_cpu = "x64"
-v8_target_cpu = "arm64"
+target_cpu = "arm64"
 
 dcheck_always_on = false
 
