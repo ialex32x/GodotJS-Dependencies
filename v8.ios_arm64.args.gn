@@ -18,9 +18,9 @@ v8_use_external_startup_data = false
 v8_enable_pointer_compression = false # Unsupported on iOS.
 
 v8_jitless = true
-# v8_enable_sparkplug = false
-# v8_enable_maglev = false
-# v8_enable_turbofan = false
+v8_enable_sparkplug = false
+v8_enable_maglev = false
+v8_enable_turbofan = false
 
 v8_enable_webassembly = false
 enable_ios_bitcode = true
