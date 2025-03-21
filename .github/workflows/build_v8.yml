@@ -495,7 +495,7 @@ jobs:
 
 
   v8_windows_x86_64:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -564,7 +564,7 @@ jobs:
           path: staging/
 
   v8_windows_arm64:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
