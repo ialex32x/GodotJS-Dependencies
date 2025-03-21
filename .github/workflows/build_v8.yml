@@ -9,10 +9,12 @@ on:
         required: true
       v8_version:
         description: 'v8 version tag'
-        type: string
+        type: choice
+        options:
+          - "12.9.202.28" # 2022
+          - "12.4.254.21" # 2019
         required: true
-        default: "12.4.254.21"
-        # default: "12.9.202.28"
+        default: "12.9.202.28"
 jobs:
   v8_android_arm64:
     runs-on: ubuntu-22.04
